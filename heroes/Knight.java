@@ -1,39 +1,19 @@
 package heroes;
 
+import abilities.Abilities;
+import abilities.KnightAbilities;
+
 public class Knight extends  Heroes {
-    public abstract float executeDamage(Heroes hero);
-    @Override
-    public void fight(Heroes hero) {
-        hero.fightWith(this);
-    }
+
 
     @Override
-    public void fightWith(Wizard wizard) {
-        this.setLocationModifier(1f);
-        if (this.getLocation().equals("L")) {
-            this.setLocationModifier(1.15f);
-            setDamageFirstAbility(exe);
-
-
-
-
-
-        }
-
+    public int accept(Abilities abilities) {
+        return abilities.visit(this);
+    }
+    //returnaza damage-ul pe care il va da Knight unui adversar de orice tip
+    public int getKnightDamage(Heroes enemy) {
+        KnightAbilities knightAbilities = new KnightAbilities();
+        return enemy.accept(knightAbilities);
     }
 
-    @Override
-    public void fightWith(Rogue rogue) {
-
-    }
-
-    @Override
-    public void fightWith(Pyromancer pyromancer) {
-
-    }
-
-    @Override
-    public void fightWith(Knight knight) {
-
-    }
 }

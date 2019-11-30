@@ -1,28 +1,16 @@
 package heroes;
 
+import abilities.Abilities;
+import abilities.RogueAbilities;
+
 public class Rogue extends  Heroes {
     @Override
-    public void fight(Heroes hero) {
-    hero.fightWith(this);
+    public int accept(Abilities abilities) {
+            return abilities.visit(this);
     }
-
-    @Override
-    public void fightWith(Wizard wizard) {
-
-    }
-
-    @Override
-    public void fightWith(Rogue rogue) {
-
-    }
-
-    @Override
-    public void fightWith(Pyromancer pyromancer) {
-
-    }
-
-    @Override
-    public void fightWith(Knight knight) {
-
+    public int getRogueDamage ( Heroes enemy) {
+        RogueAbilities rogueAbilities = new RogueAbilities();
+        return enemy.accept(rogueAbilities);
     }
 }
+

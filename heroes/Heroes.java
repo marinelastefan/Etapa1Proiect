@@ -1,24 +1,27 @@
 package heroes;
 
+import abilities.Abilities;
+import abilities.RogueAbilities;
+
 public abstract class Heroes {
-    float experience;
-    float hitPoints;
+    public float experience;
+    public int hitPoints;
+    public int maxHitPoints;
     private int xPosition;
     private int yPosition;
     private String typeOfHero;
-    private float locationModifier;
     private String location;
     private int level;
-    private float damageFirstAbility;
-    private float damageSecondAbility;
     private float totalDamage;
+    private int overtimeDamage;
+    private int round;
 
-    public void setDamageFirstAbility(float damageFirstAbility) {
-        this.damageFirstAbility = damageFirstAbility;
+    public int getRound() {
+        return round;
     }
 
-    public void setDamageSecondAbility(float damageSecondAbility) {
-        this.damageSecondAbility = damageSecondAbility;
+    public void setOvertimeDamage(int overtimeDamage) {
+        this.overtimeDamage = overtimeDamage;
     }
 
     public void setTotalDamage(float totalDamage) {
@@ -41,10 +44,6 @@ public abstract class Heroes {
         return location;
     }
 
-    public void setLocationModifier(float landModifier) {
-        this.locationModifier = landModifier;
-    }
-
     public void setTypeOfHero(String typeOfHero) {
         this.typeOfHero = typeOfHero;
     }
@@ -56,9 +55,5 @@ public abstract class Heroes {
     public void setxPosition(int xPosition) {
         this.xPosition = xPosition;
     }
-    public abstract void fight(Heroes hero);
-    public abstract void fightWith(Wizard wizard);
-    public abstract  void  fightWith( Rogue rogue);
-    public abstract void fightWith(Pyromancer pyromancer);
-    public abstract void fightWith(Knight knight);
+    public abstract int accept (Abilities abilities);
 }
