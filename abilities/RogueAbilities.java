@@ -1,85 +1,50 @@
 package abilities;
-import heroes.Knight;
-import heroes.Pyromancer;
-import heroes.Rogue;
-import heroes.Wizard;
+import constants.Constants;
+import constants.LandModifiersFactory;
+import heroes.Heroes;
 
-public class RogueAbilities extends Abilities {
-    private final int backstabBaseDamage = 200;
-    private final int backstabLevelDamage = 20;
-    private final float critical = 1.5f;
-    private final float backstabRogueModifier = 1.2f;
-    private final float backstabKnightMofifier = 0.9f;
-    private final float backstabPyromancerModifier = 1.25f;
-    private final float backstabWizardModifier = 1.25f;
-    private int firstAbilityDamage;
-    private int secondAbilityDamage;
-    private final float paralysisRogueModifier = 0.9f;
-    private final float paralysisKnightModifier = 0.8f;
-    private final float paralysisWizardModifier = 1.25f;
-    private final float paralysisPyromancerModifier = 1.20f;
-    private final int paralysisBaseDamage = 40;
-    private final int paralisysLevelDamage = 10;
-    private float locationModifier;
-    private int totalDamage;
+public final class RogueAbilities extends Abilities {
+
     @Override
-    public int visit (Wizard wizard) {
-        if(wizard.getLocation().equals("W")) {
-            locationModifier = 1.15f;
+    public  int damageCalculator(final Heroes enemy, final Heroes hero) {
+        //super.damageCalculator(enemy, hero);
+        float criticalDamage;
+        int firstAbilityDamage;
+        int secondAbilityDamage;
+        //verific daca trebuie sa aplic critical
+        if (enemy.getRound() % Constants.THREE_BY_THREE == 0
+                && enemy.getLocation().equals("W")) {
+            criticalDamage = LandModifiersFactory.getCriticalDamage();
         } else {
-            locationModifier = 1f;
+            criticalDamage = LandModifiersFactory.getNoModifiers();
         }
-        firstAbilityDamage = Math.round(Math.round((backstabBaseDamage + wizard.getLevel()
-                * backstabLevelDamage)*critical*locationModifier) * backstabWizardModifier);
-        secondAbilityDamage = Math.round(Math.round((paralysisBaseDamage + wizard.getLevel()
-                * paralisysLevelDamage) *locationModifier) * paralysisWizardModifier);
-        wizard.setOvertimeDamage(6);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
-    }
-
-    public int visit (Pyromancer pyromancer){
-        if(pyromancer.getLocation().equals("W")) {
-            locationModifier = 1.5f;
+        float locationModifier;
+        //verific daca se afla pe Woods si setez damageOvertime pentru adversar
+        if (enemy.getLocation().equals("W")) {
+            locationModifier = factory.getLandModifiers("W");
+            enemy.setParalysisOvertimeDamage(
+                    LandModifiersFactory.getSuperNmbOvertimeParalysisDamage());
+            enemy.setCanMove(LandModifiersFactory.getSuperNmbOvertimeParalysisDamage());
         } else {
-            locationModifier = 1;
+            enemy.setParalysisOvertimeDamage(LandModifiersFactory.getNmbOvertimeParalysisDamage());
+            enemy.setCanMove(LandModifiersFactory.getNmbOvertimeParalysisDamage());
+            locationModifier = LandModifiersFactory.getNoModifiers();
         }
-        firstAbilityDamage = Math.round(Math.round((backstabBaseDamage + pyromancer.getLevel()
-                * backstabLevelDamage)*critical*locationModifier) * backstabPyromancerModifier);
-        secondAbilityDamage = Math.round(Math.round((paralysisBaseDamage + pyromancer.getLevel()
-                * paralisysLevelDamage) *locationModifier) * paralysisPyromancerModifier);
-        pyromancer.setOvertimeDamage(6);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
-
-    }
-    public int visit (Knight knight) {
-        if(knight.getLocation().equals("W")) {
-            locationModifier = 1.5f;
-        } else {
-            locationModifier = 1;
-        }
-        firstAbilityDamage = Math.round(Math.round((backstabBaseDamage + knight.getLevel()
-                * backstabLevelDamage)*critical*locationModifier) * backstabKnightMofifier);
-        secondAbilityDamage = Math.round(Math.round((paralysisBaseDamage + knight.getLevel()
-                * paralisysLevelDamage) *locationModifier) * paralysisKnightModifier);
-        knight.setOvertimeDamage(6);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
+        //retin damage fara raceModifiers in caz ca adversarul e Wizard
+        firstAbilityDamage = Math.round((factory.getAllDamages("backstab")
+                + hero.getLevel() * factory.getAllLevelDamages("backstab"))
+                * criticalDamage * locationModifier);
+        secondAbilityDamage = Math.round((factory.getAllDamages("paralysis")
+                + hero.getLevel() * factory.getAllLevelDamages("paralysis"))
+                 * locationModifier);
+        enemy.setDamageReceived(firstAbilityDamage + secondAbilityDamage);
+        firstAbilityDamage = Math.round(firstAbilityDamage
+                * hero.getRaceModifiers1(enemy.getTypeOfHero()));
+        secondAbilityDamage = Math.round(secondAbilityDamage
+                * hero.getRaceModifiers2(enemy.getTypeOfHero()));
+        return  firstAbilityDamage + secondAbilityDamage;
 
     }
-    public int visit (Rogue rogue) {
-        if(rogue.getLocation().equals("W")) {
-            locationModifier = 1.5f;
-        } else {
-            locationModifier = 1;
-        }
-        firstAbilityDamage = Math.round(Math.round((backstabBaseDamage + rogue.getLevel()
-                * backstabLevelDamage)*critical*locationModifier) * backstabRogueModifier);
-        secondAbilityDamage = Math.round(Math.round((paralysisBaseDamage + rogue.getLevel()
-                * paralisysLevelDamage) *locationModifier) * paralysisRogueModifier);
-        rogue.setOvertimeDamage(6);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
-    }
+
+
 }

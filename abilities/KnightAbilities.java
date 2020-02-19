@@ -1,89 +1,53 @@
 package abilities;
 
-import heroes.Knight;
-import heroes.Pyromancer;
-import heroes.Rogue;
-import heroes.Wizard;
+import constants.Constants;
+import constants.HeroesConstants;
+import constants.LandModifiersFactory;
+import heroes.Heroes;
 
-public class KnightAbilities extends Abilities {
-    private final int executeBaseDamage = 200;
-    private final int executeLevelDamage = 30;
-    private final float hp = 0.2f;
-    private final float executeLevelHP = 0.01f;
-    private final float executeRogueModifier = 1.15f;
-    private final  float executeKnightModifier = 1f;
-    private final float executePyromancerModifier = 1.1f;
-    private final float executeWizardModifier = 0.8f;
-    private final int slamBaseDamage = 100;
-    private final int slamLevelDamage = 40;
-    private final float slamRogueModifier = 0.8f;
-    private final float slamKnightModifier = 1.2f;
-    private final float slamPyromancerModifier = 0.9f;
-    private final float slamdWizardModifier = 1.05f;
-    private int firstAbilityDamage;
-    private int secondAbilityDamage;
-    private int totalDamage;
-    private float locationModifier;
+public final class KnightAbilities extends Abilities {
+    private LandModifiersFactory factory = new LandModifiersFactory();
+
 
     @Override
-    public int visit(Wizard wizard) {
-        if (wizard.getLocation().equals("L")) {
-            locationModifier = 1.15f;
+    public  int damageCalculator(final Heroes enemy, final Heroes hero) {
+        float landModifier;
+        float hpLimit;
+        int firstAblityDamage;
+        int secondAbilityDamage;
+        //verific daca se afla pe Land
+        if (enemy.getLocation().equals("L")) {
+            landModifier = factory.getLandModifiers("L");
         } else {
-            locationModifier = 1f;
+            landModifier = LandModifiersFactory.getNoModifiers();
         }
-        firstAbilityDamage = Math.round(Math.round((executeBaseDamage + executeLevelDamage * wizard.getLevel()) *
-                locationModifier) * executeWizardModifier);
-        secondAbilityDamage = Math.round(Math.round((slamBaseDamage + slamBaseDamage* wizard.getLevel()) *
-                locationModifier) * slamdWizardModifier);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
-    }
+        //in caz ca enemy e Wizard retin damage-ul fara race Modifiers
+         firstAblityDamage = Math.round(landModifier * (factory.getAllDamages("execute")
+                 + hero.getLevel() * factory.getAllLevelDamages("execute")));
+        hpLimit = Math.round(Math.round(Constants.PROCENT
+                * enemy.getLevelHp() + Constants.LEVEL_PROCENT * enemy.getLevel()));
+        if (hpLimit > HeroesConstants.getHpLimit()) {
+            hpLimit = HeroesConstants.getHpLimit();
 
-    @Override
-    public int visit(Rogue rogue) {
-        if (rogue.getLocation().equals("L")) {
-            locationModifier = 1.15f;
-        } else {
-            locationModifier = 1f;
         }
-        firstAbilityDamage = Math.round(Math.round((executeBaseDamage + executeLevelDamage * rogue.getLevel()) *
-                locationModifier) * executeRogueModifier);
-        secondAbilityDamage = Math.round(Math.round((slamBaseDamage + slamBaseDamage* rogue.getLevel()) *
-                locationModifier) * slamRogueModifier);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
-    }
-
-    @Override
-    public int visit(Knight knight) {
-        if (knight.getLocation().equals("L")) {
-            locationModifier = 1.15f;
-        } else {
-            locationModifier = 1f;
+        //adversarul va fi omorat direct
+        if (hpLimit  > enemy.getHP() && hpLimit > Constants.HP_LIMIT) {
+            enemy.setHP(0);
         }
-        firstAbilityDamage = Math.round(Math.round((executeBaseDamage + executeLevelDamage * knight.getLevel()) *
-                locationModifier) * executeKnightModifier);
-        secondAbilityDamage = Math.round(Math.round((slamBaseDamage + slamBaseDamage* knight.getLevel()) *
-                locationModifier) * slamKnightModifier);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
+         secondAbilityDamage = Math.round(landModifier * (factory.getAllDamages("slam")
+                + hero.getLevel() * factory.getAllLevelDamages("slam")));
+        //retin damage-ul fara raceModifiers in caz ca adversarul e Wizard
+        int damage = firstAblityDamage + secondAbilityDamage;
+            enemy.setDamageReceived(damage);
+         firstAblityDamage = Math.round(firstAblityDamage
+                 * hero.getRaceModifiers1(enemy.getTypeOfHero()));
+         secondAbilityDamage = Math.round(secondAbilityDamage
+                 * hero.getRaceModifiers2(enemy.getTypeOfHero()));
+         //incapacitatea adversarului de a se misca
+         enemy.setCanMove(1);
+         enemy.setSlamOvertimeDamage(1);
+        return firstAblityDamage + secondAbilityDamage;
 
     }
 
-    @Override
-    public int visit(Pyromancer pyromancer) {
-        if (pyromancer.getLocation().equals("L")) {
-            locationModifier = 1.15f;
-        } else {
-            locationModifier = 1f;
-        }
-        firstAbilityDamage = Math.round(Math.round((executeBaseDamage + executeLevelDamage * pyromancer.getLevel()) *
-                locationModifier) * executePyromancerModifier);
-        secondAbilityDamage = Math.round(Math.round((slamBaseDamage + slamBaseDamage* pyromancer.getLevel()) *
-                locationModifier) * slamPyromancerModifier);
-        totalDamage = firstAbilityDamage + secondAbilityDamage;
-        return totalDamage;
-
-    }
 }

@@ -1,88 +1,34 @@
 package abilities;
 
-import heroes.Knight;
-import heroes.Pyromancer;
-import heroes.Rogue;
-import heroes.Wizard;
+import constants.LandModifiersFactory;
+import heroes.Heroes;
+public final class PyromancerAbilities extends Abilities {
+   // LandModifiersFactory factory = LandModifiersFactory.getInstance();
 
-public class PyromancerAbilities extends Abilities{
-    private final int fireblastBaseDamage = 350;
-    private final int fireblastLevelDamage = 50;
-    private final float fireblastRogueModifier = 0.8f;
-    private final float fireblastPyromancerModifier = 0.9f;
-    private final float fireblastWizardMOdifier = 1.05f;
-    private final int igniteBaseDamage = 150;
-    private final int igniteLevelDamage = 20;
-    private final int igniteBaseDamage2 = 50;
-    private final int igniteLevelDamage2 = 30;
-    private final float igniteRogueModifier = 0.8f;
-    private final float ignitePyromancerModifier = 0.9f;
-    private final float igniteKnightModifier = 1.2f;
-    private final float igniteWizardModifier = 1.05f;
-    private int firstAbilityDamage;
-    private int secondAbilityDamage;
-    private int totalDamage;
-    private int totalAbility;
-    private float locationModifier;
 
-    public void visit(Wizard wizard) {
-        if(wizard.getLocation().equals("v")) {
-            locationModifier = 1.25f;
+    @Override
+    public  int damageCalculator(final Heroes enemy, final Heroes hero) {
+        float landModifier;
+        int firstAbilityDamage;
+        int secondAbilityDamage;
+        if (enemy.getLocation().equals("V")) {
+            landModifier = factory.getLandModifiers("V");
         } else {
-            locationModifier = 1f;
+            landModifier = LandModifiersFactory.getNoModifiers();
         }
-        firstAbilityDamage = Math.round(Math.round((fireblastBaseDamage + fireblastLevelDamage * wizard.getLevel()) *
-               locationModifier) * fireblastWizardMOdifier);
-        secondAbilityDamage = Math.round(Math.round((igniteBaseDamage + igniteLevelDamage * wizard.getLevel()) *
-                    locationModifier) * igniteWizardModifier);
-        totalDamage = fireblastBaseDamage + secondAbilityDamage;
+        firstAbilityDamage = Math.round(landModifier * (factory.getAllDamages("fireblast")
+            + hero.getLevel() * factory.getAllLevelDamages("fireblast")));
+        secondAbilityDamage = Math.round(landModifier * (factory.getAllDamages("ignite")
+            + hero.getLevel() * factory.getAllLevelDamages("ignite")));
+        //retin damage-ul fara modificatori in caz ca adversarul este wizard
+        enemy.setDamageReceived(firstAbilityDamage + secondAbilityDamage);
+        firstAbilityDamage = Math.round(firstAbilityDamage
+                * hero.getRaceModifiers1(enemy.getTypeOfHero()));
+        secondAbilityDamage = Math.round(secondAbilityDamage
+                * hero.getRaceModifiers2(enemy.getTypeOfHero()));
+        //ii setez damage overtime
+        enemy.setIgniteOvertimeDamage(2);
+        return  firstAbilityDamage + secondAbilityDamage;
     }
 
-    public void visit(Rogue rogue) {
-        if(rogue.getLocation().equals("v")) {
-            locationModifier = 1.25f;
-        } else {
-            locationModifier = 1f;
-        }
-        firstAbilityDamage = Math.round(Math.round((fireblastBaseDamage + fireblastLevelDamage * rogue.getLevel()) *
-                locationModifier) * fireblastRogueModifier);
-
-        secondAbilityDamage = Math.round(Math.round((igniteBaseDamage + igniteLevelDamage * rogue.getLevel()) *
-                    locationModifier) * igniteRogueModifier);
-
-        totalDamage = fireblastBaseDamage + secondAbilityDamage;
-
-    }
-
-    public void visit(Knight knight) {
-        if(knight.getLocation().equals("v")) {
-            locationModifier = 1.25f;
-        } else {
-            locationModifier = 1f;
-        }
-        firstAbilityDamage = Math.round(Math.round((fireblastBaseDamage + fireblastLevelDamage * knight.getLevel()) *
-                locationModifier) * fireblastWizardMOdifier);
-
-        secondAbilityDamage = Math.round(Math.round((igniteBaseDamage + igniteLevelDamage * knight.getLevel()) *
-                    locationModifier) * igniteKnightModifier);
-
-        totalDamage = fireblastBaseDamage + secondAbilityDamage;
-
-    }
-
-    public void visit(Pyromancer pyromancer) {
-        if(pyromancer.getLocation().equals("v")) {
-            locationModifier = 1.25f;
-        } else {
-            locationModifier = 1f;
-        }
-        firstAbilityDamage = Math.round(Math.round((fireblastBaseDamage + fireblastLevelDamage * pyromancer.getLevel()) *
-                locationModifier) * fireblastPyromancerModifier);
-
-        secondAbilityDamage = Math.round(Math.round((igniteBaseDamage + igniteLevelDamage * pyromancer.getLevel()) *
-                    locationModifier) * ignitePyromancerModifier);
-
-        totalDamage = fireblastBaseDamage + secondAbilityDamage;
-
-    }
 }
